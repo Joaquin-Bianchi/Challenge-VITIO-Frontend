@@ -1,0 +1,29 @@
+{
+  "todos": [
+    {
+      "todo": "Hacer ",
+      "status": "completed",
+      "id": "2"
+    },
+    {
+      "id": "3",
+      "todo": "Pagar facturas",
+      "status": "pending"
+    },
+    {
+      "id": "fffe",
+      "todo": "ee",
+      "status": "pending"
+    },
+    {
+      "id": "9480",
+      "todo": "Hacer la comida",
+      "status": "pending"
+    },
+    {
+      "id": "0c4b",
+      "todo": "awdad",
+      "status": "pending"
+    }
+  ]
+}
