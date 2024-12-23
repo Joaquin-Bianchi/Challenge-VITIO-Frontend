@@ -1,6 +1,7 @@
 # Challenge VITIO Frontend
 
-## Funcionalidades
+ Esta aplicación de tareas fue construida de forma modular y ordenada, permitiendo reutilizar fácilmente sus componentes y añadir nuevas funcionalidades sin complicaciones
+ y para el diseño decidi hacerlo con un estilo moderno y minimalista
 
 
 ## Tecnologías
