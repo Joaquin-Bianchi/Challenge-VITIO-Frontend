@@ -16,7 +16,7 @@ import { Todo } from "@/interfaces/todo.interface";
 import TodosTable from "./components/table/TodosTable";
 import CreateTodoForm from "./components/forms/CreateTodoForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ListTodo, Filter, Loader2 } from "lucide-react";
+import { ListTodo, Filter } from "lucide-react";
 import { LoadingState } from "./components/loading/LoadingState";
 import ErrorState from "@/components/error/ErrorState";
 
