@@ -1,4 +1,6 @@
 # Challenge VITIO Frontend
+![image](https://github.com/user-attachments/assets/810f09f9-6c50-43de-9f4a-00d6c13a599f)
+
 
  Esta aplicación de tareas fue construida de forma modular y ordenada, permitiendo reutilizar fácilmente sus componentes y añadir nuevas funcionalidades sin complicaciones
  y para el diseño decidi hacerlo con un estilo moderno y minimalista
