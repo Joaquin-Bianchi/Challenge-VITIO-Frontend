@@ -1,21 +1,29 @@
 import { Todo } from "@/interfaces/todo.interface";
 
-const API_URL = "http://localhost:3000";
+const STORAGE_KEY = "todos-list";
+
+const getStoredTodos = (): Todo[] => {
+  const storedTodos = localStorage.getItem(STORAGE_KEY);
+  return storedTodos ? JSON.parse(storedTodos) : [];
+};
+
+const saveTodosToStorage = (todos: Todo[]) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+};
 
 export const getTodos = async (page = 1, limit = 5) => {
   try {
-    const todosResponse = await fetch(
-      `${API_URL}/todos?_page=${page}&_per_page=${limit}`
-    );
-    const todos = await todosResponse.json();
+    const allTodos = getStoredTodos();
 
-    const totalResponse = await fetch(`${API_URL}/todos`);
-    const totalTodos = await totalResponse.json();
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedTodos = allTodos.slice(startIndex, endIndex);
 
-    const totalCount = totalTodos.length;
+    const totalCount = allTodos.length;
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
     return {
-      todos,
+      todos: paginatedTodos,
       totalCount,
       totalPages,
     };
@@ -27,13 +35,15 @@ export const getTodos = async (page = 1, limit = 5) => {
 
 export const createTodo = async (todo: Todo) => {
   try {
-    const response = await fetch(`${API_URL}/todos`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(todo),
-    });
-    const data = await response.json();
-    return data;
+    const todos = getStoredTodos();
+
+    const newId = Date.now().toString();
+    const newTodo = { ...todo, id: newId };
+
+    todos.push(newTodo);
+    saveTodosToStorage(todos);
+
+    return newTodo;
   } catch (error: any) {
     throw error;
   }
@@ -41,18 +51,17 @@ export const createTodo = async (todo: Todo) => {
 
 export const editTodo = async (todo: Todo) => {
   try {
-    const response = await fetch(`${API_URL}/todos/${todo.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(todo),
-    });
+    const todos = getStoredTodos();
+    const index = todos.findIndex((t) => t.id === todo.id);
 
-    if (!response.ok) {
-      throw new Error(`Error al editar: ${response.status}`);
+    if (index === -1) {
+      throw new Error(`Error al editar: Todo no encontrado`);
     }
 
-    const data = await response.json();
-    return data;
+    todos[index] = todo;
+    saveTodosToStorage(todos);
+
+    return todo;
   } catch (error: any) {
     throw error;
   }
@@ -60,22 +69,18 @@ export const editTodo = async (todo: Todo) => {
 
 export const editStatusTodo = async (todoId: string, status: string) => {
   try {
-    const todo = await getTodoById(todoId);
-    const updatedTodo = {
-      ...todo,
-      status,
-    };
-    const response = await fetch(`${API_URL}/todos/${todoId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTodo),
-    });
+    const todos = getStoredTodos();
+    const todo = todos.find((t) => t.id === todoId);
 
-    if (!response.ok) {
-      throw new Error("Error al actualizar el estado");
+    if (!todo) {
+      throw new Error("Todo no encontrado");
     }
 
-    return await response.json();
+    const updatedTodo = { ...todo, status };
+    const updatedTodos = todos.map((t) => (t.id === todoId ? updatedTodo : t));
+
+    saveTodosToStorage(updatedTodos);
+    return updatedTodo;
   } catch (error) {
     throw error;
   }
@@ -83,15 +88,15 @@ export const editStatusTodo = async (todoId: string, status: string) => {
 
 export const deleteTodoById = async (todoId: string) => {
   try {
-    const response = await fetch(`${API_URL}/todos/${todoId}`, {
-      method: "DELETE",
-    });
+    const todos = getStoredTodos();
+    const updatedTodos = todos.filter((t) => t.id !== todoId);
 
-    if (!response.ok) {
-      throw new Error(`Error al eliminar: ${response.status}`);
+    if (todos.length === updatedTodos.length) {
+      throw new Error(`Error al eliminar: Todo no encontrado`);
     }
 
-    return response;
+    saveTodosToStorage(updatedTodos);
+    return new Response(null, { status: 200 });
   } catch (error: any) {
     throw error;
   }
@@ -99,8 +104,13 @@ export const deleteTodoById = async (todoId: string) => {
 
 export const getTodoById = async (todoId: string) => {
   try {
-    const response = await fetch(`${API_URL}/todos/${todoId}`);
-    const todo = await response.json();
+    const todos = getStoredTodos();
+    const todo = todos.find((t) => t.id === todoId);
+
+    if (!todo) {
+      throw new Error("Todo no encontrado");
+    }
+
     return todo;
   } catch (error: any) {
     throw error;
